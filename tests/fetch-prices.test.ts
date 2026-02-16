@@ -263,6 +263,28 @@ describe('refreshAllPrices', () => {
     expect(mockFetch).toHaveBeenCalledTimes(2);
   });
 
+  it('should set stablecoin price to 1 instead of fetching', async () => {
+    const assets: Asset[] = [
+      { id: '1', type: 'CRYPTO', symbol: 'RWUSD', name: 'RWUSD', quantity: 1000, avgPrice: 1, currentPrice: 1, currency: 'USD', transactions: [] },
+      { id: '2', type: 'CRYPTO', symbol: 'BFUSD', name: 'BFUSD', quantity: 5000, avgPrice: 1, currentPrice: 1, currency: 'USD', transactions: [] },
+      { id: '3', type: 'CRYPTO', symbol: 'FDUSD', name: 'FDUSD', quantity: 2000, avgPrice: 1, currentPrice: 1, currency: 'USD', transactions: [] },
+      { id: '4', type: 'CRYPTO', symbol: 'BTC', name: 'Bitcoin', quantity: 1, avgPrice: 60000, currentPrice: 60000, currency: 'USD', transactions: [] },
+    ];
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ price: '70000.00' }),
+    }); // only BTC should be fetched
+
+    const prices = await refreshAllPrices(assets);
+    expect(prices.get('RWUSD')).toBe(1);
+    expect(prices.get('BFUSD')).toBe(1);
+    expect(prices.get('FDUSD')).toBe(1);
+    expect(prices.get('BTC')).toBe(70000);
+    // stablecoins should not trigger any fetch
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
   it('should handle partial failures gracefully', async () => {
     const assets: Asset[] = [
       { id: '1', type: 'CRYPTO', symbol: 'BTC', name: 'Bitcoin', quantity: 1, avgPrice: 60000, currentPrice: 60000, currency: 'USD', transactions: [] },

@@ -87,7 +87,7 @@ export interface ConfigFile {
 export const STABLECOINS = new Set([
   'USDT', 'USDC', 'BUSD', 'TUSD', 'USDP', 'DAI', 'FRAX',
   'FDUSD', 'PYUSD', 'USD1', 'USDD', 'GUSD', 'LUSD', 'SUSD',
-  'USDS', 'U', 'RWUSD',
+  'USDS', 'U', 'RWUSD', 'BFUSD',
 ]);
 
 export const COINGECKO_MAP: Record<string, string> = {

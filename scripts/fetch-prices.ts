@@ -1,5 +1,5 @@
 import type { Asset, ExchangeRates, AssetType, Currency } from './utils.js';
-import { COINGECKO_MAP, DEFAULT_FX_RATES, detectAssetDetails } from './utils.js';
+import { COINGECKO_MAP, DEFAULT_FX_RATES, STABLECOINS, detectAssetDetails } from './utils.js';
 
 // ─── Crypto Price (Binance → CoinGecko fallback) ───────────────────
 
@@ -150,6 +150,10 @@ export async function refreshAllPrices(assets: Asset[]): Promise<Map<string, num
       return true;
     })
     .map(async (a) => {
+      if (STABLECOINS.has(a.symbol)) {
+        prices.set(a.symbol, 1);
+        return;
+      }
       let price: number | null = null;
       if (a.type === 'CRYPTO') {
         price = await fetchCryptoPrice(a.symbol);

@@ -18,6 +18,11 @@ describe('STABLECOINS', () => {
     expect(STABLECOINS.has('FDUSD')).toBe(true);
   });
 
+  it('should contain BFUSD and RWUSD as stablecoins', () => {
+    expect(STABLECOINS.has('BFUSD')).toBe(true);
+    expect(STABLECOINS.has('RWUSD')).toBe(true);
+  });
+
   it('should not contain non-stablecoins', () => {
     expect(STABLECOINS.has('BTC')).toBe(false);
     expect(STABLECOINS.has('ETH')).toBe(false);
