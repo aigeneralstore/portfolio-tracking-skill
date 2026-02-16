@@ -1,3 +1,8 @@
+---
+name: portfolio-tracker
+description: An investment portfolio tracker that runs entirely locally. All data stays in ~/.portfolio-tracker/.
+---
+
 # Portfolio Tracker Skill
 
 An investment portfolio tracker that runs entirely locally. All data stays in `~/.portfolio-tracker/`.
