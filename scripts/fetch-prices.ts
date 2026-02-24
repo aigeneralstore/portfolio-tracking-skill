@@ -1,5 +1,6 @@
 import type { Asset, ExchangeRates, AssetType, Currency } from './utils.js';
 import { COINGECKO_MAP, DEFAULT_FX_RATES, STABLECOINS, detectAssetDetails } from './utils.js';
+import { loadData, saveData } from './data-store.js';
 
 // ─── Crypto Price (Binance → CoinGecko fallback) ───────────────────
 
@@ -210,7 +211,7 @@ if (command) {
         break;
       }
       case 'refresh': {
-        // Read assets from stdin
+        // Read assets from stdin, output prices to stdout (no save)
         const input = await new Promise<string>((resolve) => {
           let data = '';
           process.stdin.on('data', chunk => data += chunk);
@@ -219,6 +220,41 @@ if (command) {
         const assets = JSON.parse(input) as Asset[];
         const prices = await refreshAllPrices(assets);
         result = Object.fromEntries(prices);
+        break;
+      }
+      case 'refresh-save': {
+        // Load data, refresh prices, save data
+        const data = loadData();
+        const assets = data.portfolios.find(p => p.id === data.currentPortfolioId)?.assets || [];
+        const prices = await refreshAllPrices(assets);
+        
+        // Update asset prices
+        for (const portfolio of data.portfolios) {
+          for (const asset of portfolio.assets) {
+            if (prices.has(asset.symbol)) {
+              asset.currentPrice = prices.get(asset.symbol)!;
+            }
+          }
+        }
+        
+        // Update exchange rates
+        const fxRates = await fetchFXRates();
+        data.exchangeRates = fxRates;
+        data.lastPriceRefresh = new Date().toISOString();
+        
+        // Save
+        saveData(data);
+        
+        result = { 
+          success: true, 
+          pricesUpdated: prices.size,
+          lastPriceRefresh: data.lastPriceRefresh,
+          samplePrices: {
+            BTC: prices.get('BTC'),
+            ETH: prices.get('ETH'),
+            BNB: prices.get('BNB'),
+          }
+        };
         break;
       }
       default:

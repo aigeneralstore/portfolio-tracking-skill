@@ -137,6 +137,10 @@ export function deletePortfolio(data: DataFile, portfolioId: string): DataFile {
 
 const command = process.argv[2];
 
+// Only execute CLI for valid commands (to prevent execution when imported)
+const validCommands = ['load', 'save', 'load-config', 'save-config'];
+if (command && validCommands.includes(command)) {
+
 if (command) {
   try {
     let result: unknown;
@@ -173,4 +177,5 @@ if (command) {
     console.log(JSON.stringify({ error: err.message }));
     process.exit(1);
   }
+}
 }
